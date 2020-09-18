@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
 from .models import Client, UrlCut
 
@@ -20,3 +21,9 @@ class UrlCutSerializer(serializers.ModelSerializer):
     class Meta:
         model = UrlCut
         fields = '__all__'
+        validators = [
+            UniqueTogetherValidator(
+                queryset=UrlCut.objects.all(),
+                fields=['url_original', 'url_cut']
+            )
+        ]
