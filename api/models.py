@@ -4,6 +4,7 @@ from django.db import models
 
 User = get_user_model()
 
+
 class Client(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -12,5 +13,8 @@ class Client(models.Model):
 
 
 class UrlCut(models.Model):
-    url_original = models.SlugField(unique=True)
-    url_cut = models.SlugField(unique=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    id = models.IntegerField(primary_key=True)
+    url_original = models.URLField()
+    url_cut = models.URLField(unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)

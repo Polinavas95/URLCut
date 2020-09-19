@@ -5,10 +5,9 @@ from .views import UrlCutViewSet, ClientViewSet
 router = DefaultRouter()
 
 router.register(r'clients', ClientViewSet, basename='Client')
-router.register(r'(a-zA-Z0-9){6}', UrlCutViewSet, basename='URL')
-
+router.register(r'(?P<author>[<a-zA-Z0-9]+)', UrlCutViewSet, basename='URL')
 
 urlpatterns = [
-    path('url_cut/', include(router.urls)),
+    path('', include(router.urls)),
 ]
 
