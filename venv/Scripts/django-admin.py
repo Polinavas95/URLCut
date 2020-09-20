@@ -1,4 +1,4 @@
-#!C:\Dev\URLCut\venv\Scripts\python.exe
+#!c:\dev\urlcut\venv\scripts\python.exe
 # When the django-admin.py deprecation ends, remove this script.
 import warnings
 

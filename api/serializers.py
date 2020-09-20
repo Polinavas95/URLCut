@@ -3,7 +3,7 @@ from rest_framework.validators import UniqueTogetherValidator
 
 from django.shortcuts import render, get_object_or_404
 
-from .models import Client, UrlCut
+from .models import Client, CutURL
 
 
 class ClientSerializer(serializers.ModelSerializer):
@@ -18,23 +18,26 @@ class ClientSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class UrlCutSerializer(serializers.ModelSerializer):
+class CutURLSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = UrlCut
+        model = CutURL
         fields = '__all__'
-        unique_together = ('url_original', 'url_cut')
+        unique_together = ('origUrl', 'cutUrl')
         validators = [
             UniqueTogetherValidator(
-                queryset=UrlCut.objects.all(),
-                fields=['url_original', 'url_cut']
+                queryset=CutURL.objects.all(),
+                fields=['origUrl', 'cutUrl']
             )
         ]
 
     def get_short_url(self, url):
-        url_original = get_object_or_404(UrlCut, url_original=url)
-        url_cut = ''
-        for i in range(len(url_original)):
-            if url_cut.find(url_original[i]) == -1:
-                url_cut += url_original[i]
-        return url_cut
+        origUrl = get_object_or_404(CutURL, origUrl=url)
+        cutUrl = ''
+        for i in range(len(origUrl)):
+            if cutUrl.find(origUrl[i]) == -1:
+                cutUrl += origUrl[i]
+        return cutUrl
+
+    def create(self, validated_data):
+        return CutURL.objects.create(**validated_data)

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %} Запись {{ user.username }} {% endblock %}
+
+{% block content %}
+<main role="main" class="container">
+    <div class="row">
+            <div class="col-md-3 mb-3 mt-1">
+                {% include 'includes/author_contact.html' %}
+            </div>
+        <div class="col-md-9">
+            <!-- Пост -->
+                {% for post in page %}
+                    {% include 'includes/post_item.html' with post=post %}
+                {% endfor %}
+            {% for item in items %}
+        <hr>
+          <div class="media mb-4">
+            <div class="media-body">
+              <h5 class="mt-0">
+              <a href="{% url 'profile' item.author.username %}" name="comment_{{ item.id }}">{{ item.author.username }}</a>
+              </h5>
+              {{ item.text }}
+            </div>
+          </div>
+          <div>
+            <small class="text-muted" >{{ item.created }}</small>
+          </div>
+            {% empty %}
+            <p>Добавьте первый комментарий к данной записи!</p>
+        {% endfor %}
+        {% include 'includes/comments.html' %}
+    </div>
+  </div>
+</main>
+{% endblock %}

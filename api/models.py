@@ -12,9 +12,9 @@ class Client(models.Model):
         return self.author
 
 
-class UrlCut(models.Model):
+class CutURL(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     id = models.IntegerField(primary_key=True)
-    url_original = models.URLField()
-    url_cut = models.URLField(unique=True)
+    origUrl = models.URLField()
+    cutUrl = models.URLField(unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
