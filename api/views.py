@@ -59,8 +59,9 @@ class CutURLViewSet(mixins.CreateModelMixin,
             status=status.HTTP_201_CREATED
         )
 
-    def retrieve(self, request, pk):
-        url = CutURL.objects.get('origUrl').filter(pk=pk)
+    def retrieve(self, request):
+        orig_url = request.GET.get('origUrl')
+        url = get_object_or_404(CutURL, origUrl=orig_url)
         return redirect(url)
 
 
