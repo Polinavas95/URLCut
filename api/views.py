@@ -1,14 +1,25 @@
 import random
 from string import ascii_letters, digits
 
-from django.shortcuts import get_object_or_404, redirect
-from requests import Response
-from rest_framework import viewsets, mixins, filters, status
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.views.generic import CreateView
+from rest_framework import viewsets, mixins, filters, generics
 
-from .models import Client, CutURL
-from .serializers import ClientSerializer, CutURLSerializer
+from .models import CutURL
+from .serializers import CutURLSerializer
 from .permission import OwnResourcePermission
+
+
+CHOICE = ascii_letters + digits
+
+
+def get_url(k: int) -> str:
+    path = ''.join(random.choices(CHOICE, k=k))
+    check_path = CutURL.objects.filter(path=path).first()
+    if check_path:
+        return get_url(k)
+    return path
 
 
 class PerformCreateMixin:
@@ -17,55 +28,35 @@ class PerformCreateMixin:
         serializer.save(author=self.request.user)
 
 
+
+
+class UrlRedirect(generics.GenericAPIView):
+    queryset = CutURL.objects.all()
+    lookup_field = 'path'
+
+    def get(self, request, *args, **kwargs) -> None:
+        instance = self.get_object()
+        return redirect(instance.origUrl)
+
+
 class CutURLViewSet(mixins.CreateModelMixin,
                         mixins.ListModelMixin,
                         viewsets.GenericViewSet):
     queryset = CutURL.objects.all()
     serializer_class = CutURLSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly, OwnResourcePermission,)
+    lookup_field = 'path'
+    permission_classes = (OwnResourcePermission,)
     filter_backends = [filters.SearchFilter, ]
     filter_fields = ['origUrl']
 
-    CHOICE = ascii_letters + digits
-
-    def get_random_url(self, k=7):
-        return ''.join(random.choices(self.CHOICE, k=k))
-
-    def get_cut_url(self):
-        cut_url = self.get_random_url()
-        check = CutURL.objects.get(cutUrl=cut_url)
-        if check:
-            return self.get_cut_url()
-        return cut_url
-
     def create(self, request, *args, **kwargs):
-        cut_url = request.data.get('cutUrl')
-        serializer = self.serializer_class
-        if cut_url:
-            if serializer.is_valid():
-                serializer.save(**request.data)
-                return Response(
-                    serializer.data,
-                    status=status.HTTP_201_CREATED
-                )
-            return Response(
-                serializer,
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        request.data['cutUrl'] = self.get_cut_url()
-        serializer.save(**request.data)
-        return Response(
-            serializer.data,
-            status=status.HTTP_201_CREATED
-        )
-
-    def retrieve(self, request):
-        orig_url = request.GET.get('origUrl')
-        url = get_object_or_404(CutURL, origUrl=orig_url)
-        return redirect(url)
-
-
-class ClientViewSet(PerformCreateMixin, viewsets.ModelViewSet):
-    queryset = Client.objects.all()
-    serializer_class = ClientSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly, OwnResourcePermission)
+        path = request.data.get('path')
+        origUrl = request.data.get('origUrl')
+        author = request.user
+        scheme = 'https://' if request.is_secure() else 'http://'
+        host = request.get_host()
+        if not path:
+            path = get_url(k=7)
+        cutUrl = f'{scheme}{host}/{path}'
+        request._full_data = {'author': author, 'origUrl': origUrl, 'path': path, 'cutUrl': cutUrl}
+        return super().create(request, *args, **kwargs)
