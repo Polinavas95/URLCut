@@ -3,6 +3,8 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
+
 SECRET_KEY = 'hhz7l-ltdismtf@bzyz+rple7*s*w$jak%whj@(@u0eok^f9k4'
 
 DEBUG = True
@@ -18,6 +20,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'api',
+    'users',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -35,7 +39,7 @@ ROOT_URLCONF = 'url_api.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATES_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -72,7 +76,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-Ru'
 
 TIME_ZONE = 'UTC'
 
@@ -90,3 +94,6 @@ REST_FRAMEWORK = {        'DEFAULT_AUTHENTICATION_CLASSES': [
             'rest_framework_simplejwt.authentication.JWTAuthentication',
         ],
     }
+
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/api/urls/'
