@@ -1,0 +1,15 @@
+version: '2.4'
+
+services:
+  backend:
+    container_name: backend
+    build:
+        context: ./backend
+        dockerfile: backend.dockerfile
+    command: /backend/start.sh
+    volumes:
+      - ./backend:/backend
+    ports:
+      - 80:80
+    env_file:
+      - .env
