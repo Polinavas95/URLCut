@@ -19,3 +19,5 @@ source logs.sh
 ```bash
 source exec.sh
 ```
+
+Запуск команд осуществялется из sh-терминала
