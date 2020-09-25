@@ -1,0 +1,1 @@
+docker logs backend -f --follow
